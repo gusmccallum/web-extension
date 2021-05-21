@@ -5,62 +5,66 @@
     gravity-y="flex-end"
     @show="loadPlayerOptions"
   >
-    <template v-if="!hasActivePlayerGroup">
-      <GeneralSettings small>
-        <RaisedContainer
-          v-for="optionGroup of playerOptions"
-          :key="optionGroup.title"
-          dark
-          @click="setActiveOptionGroup(optionGroup)"
-        >
-          <div class="h-10 px-4 flex flex-row items-center text-left w-full space-x-4">
-            <WebExtImg v-if="optionGroup.icon != null" :src="optionGroup.icon" class="left" />
-            <p class="flex-1">{{ optionGroup.title }}</p>
-            <p class="text-on-surface text-opacity-medium">
-              {{ getSelectedOption(optionGroup) }}
-            </p>
-            <WebExtImg src="ic_chevron_right.svg" class="opacity-medium" />
-          </div>
-        </RaisedContainer>
-        <RaisedButton dark @click="openExtensionOptions">
-          <div class="flex justify-between w-full">
-            <p class="remove-text body-1">All Settings</p>
-          </div>
-        </RaisedButton>
-      </GeneralSettings>
-      <SkippedSections two-columns />
-    </template>
-    <template v-else>
-      <div
-        class="flex flex-row items-center space-x-4 border-b border-on-surface border-opacity-divider"
-      >
-        <WebExtImg
-          class="w-6 h-6"
-          src="ic_chevron_left.svg"
-          :draggable="false"
-          @click="setActiveOptionGroup(undefined)"
-        />
-        <h6>{{ activePlayerGroup?.title }}</h6>
-      </div>
-      <div class="min-w-32 max-w-sm max-h-64 flex-1 flex flex-col">
-        <ul
-          v-for="option of activeOptions"
-          :key="option.title"
-          class="cursor-pointer"
-          @click="onClickOption(option)"
-        >
-          <li class="flex flex-row items-center space-x-4 py-2">
-            <Icon
-              :path="getRadioIcon(option.isSelected)"
-              :class="getRadioIconClass(option.isSelected)"
+    <ResizingPager :page="activePage" :duration="250">
+      <template #1>
+        <div class="w-96 p-2 pr-4 space-y-6">
+          <GeneralSettings small>
+            <RaisedContainer
+              v-for="optionGroup of playerOptions"
+              :key="optionGroup.title"
+              dark
+              @click="setActiveOptionGroup(optionGroup)"
+            >
+              <div class="h-10 px-4 flex flex-row items-center text-left w-full space-x-4">
+                <WebExtImg v-if="optionGroup.icon != null" :src="optionGroup.icon" class="left" />
+                <p class="flex-1">{{ optionGroup.title }}</p>
+                <p class="text-on-surface text-opacity-medium">
+                  {{ getSelectedOption(optionGroup) }}
+                </p>
+                <WebExtImg src="ic_chevron_right.svg" class="opacity-medium" />
+              </div>
+            </RaisedContainer>
+            <RaisedButton dark @click="openExtensionOptions">
+              <div class="flex justify-between w-full">
+                <p class="remove-text body-1">All Settings</p>
+              </div>
+            </RaisedButton>
+          </GeneralSettings>
+          <SkippedSections two-columns />
+        </div>
+      </template>
+      <template #2>
+        <div>
+          <div
+            class="flex flex-row items-center space-x-4 border-b border-on-surface border-opacity-divider p-3"
+          >
+            <WebExtImg
+              class="w-6 h-6"
+              src="ic_chevron_left.svg"
+              :draggable="false"
+              @click="setActiveOptionGroup(undefined)"
             />
-            <p class="text-on-surface" :class="getLabelClass(option.isSelected)">
-              {{ option.title }}
-            </p>
-          </li>
-        </ul>
-      </div>
-    </template>
+            <h6>{{ activePlayerGroup?.title }}</h6>
+          </div>
+          <ul class="min-w-24 max-w-sm max-h-64 flex-1 flex flex-col overflow-y-auto">
+            <li
+              v-for="option of [...activeOptions]"
+              :key="option.title"
+              @click="onClickOption(option)"
+              class="cursor-pointer flex flex-row items-center space-x-4 py-2"
+            >
+              <Icon
+                :path="getRadioIcon(option.isSelected)"
+                :class="getRadioIconClass(option.isSelected)"
+              />
+              <p class="text-on-surface" :class="getLabelClass(option.isSelected)">
+                {{ option.title }}
+              </p>
+            </li>
+          </ul>
+        </div>
+      </template>
+    </ResizingPager>
   </BasicDialog>
 </template>
 
@@ -74,6 +78,7 @@ import BasicDialog from './BasicDialog.vue';
 import useRadioIcon from '@/common/composition/useRadioIcon';
 import { useStore } from 'vuex';
 import { ActionTypes } from '@/common/store/actionTypes';
+import { ResizingPager } from 'vue-resizing-pager';
 
 export default defineComponent({
   components: {
@@ -81,6 +86,7 @@ export default defineComponent({
     GeneralSettings,
     SkippedSections,
     WebExtImg,
+    ResizingPager,
   },
   setup() {
     const store = useStore();
@@ -93,6 +99,7 @@ export default defineComponent({
     };
     const activePlayerGroup = ref<PlayerOptionGroup | undefined>();
     const hasActivePlayerGroup = computed(() => activePlayerGroup.value != null);
+    const activePage = computed(() => (!hasActivePlayerGroup.value ? 1 : 2));
     const setActiveOptionGroup = (optionGroup: PlayerOptionGroup | undefined): void => {
       activePlayerGroup.value = optionGroup;
     };
@@ -122,6 +129,7 @@ export default defineComponent({
       loadPlayerOptions,
       activePlayerGroup,
       hasActivePlayerGroup,
+      activePage,
       setActiveOptionGroup,
       getSelectedOption,
       playerOptions,
@@ -160,7 +168,7 @@ export default defineComponent({
   padding: 0.5rem !important;
 }
 
-.min-w-32 {
-  min-width: 16rem;
+.min-w-24 {
+  min-width: 12rem;
 }
 </style>

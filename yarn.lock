@@ -9328,6 +9328,13 @@ vue-loader@^16.1.2:
     hash-sum "^2.0.0"
     loader-utils "^2.0.0"
 
+vue-resizing-pager@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/vue-resizing-pager/-/vue-resizing-pager-0.2.1.tgz#5713b687725cc582ad1ca4175f205498bc5b8cdb"
+  integrity sha512-TkMJJo2UPc3PYkTN1NrBVNwJp7zy7xiEC3CSjVBWEcbH/eAtB92Ja7LlEVo4k3w/eV8MeAfTGtsk2NNgUuNC9Q==
+  dependencies:
+    vue "^3.0.5"
+
 vue-tsc@^0.0.14:
   version "0.0.14"
   resolved "https://registry.yarnpkg.com/vue-tsc/-/vue-tsc-0.0.14.tgz#d79f53d534287f5716cd341346747207fbf4611c"
