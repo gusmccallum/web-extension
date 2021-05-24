@@ -1,108 +1,104 @@
 <template>
-  <LoadingOverlay class="h-full" :is-loading="isSavingTimestamps">
-    <div class="flex flex-col h-full">
-      <header
-        class="pl-4 pr-2 pb-2 -mt-1.5 -mx-4 border-b border-on-surface border-opacity-divider flex-shrink-0"
-      >
-        <h6 class="section-header flex flex-row items-center justify-between">
-          <span>Timestamps</span>
-          <ToolbarButton icon="ic_close.svg" @click="hideDialog()" />
-        </h6>
-      </header>
-      <div class="scroll -mx-4 select-none pt-2 flex-1">
-        <table class="w-full">
-          <tr>
-            <td :colspan="4" class="px-4 text-center">
-              <ToolbarButton
-                v-if="isEditing"
-                class="w-full"
-                title="New timestamp"
-                icon="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
-                @click="onClickAddNew"
-              />
-              <p v-if="!canEditTimestamps" class="text-error body-2 my-2">
-                <template v-if="!isLoggedIn"
-                  >You need to be
-                  <a href="#" @click.prevent.stop="openLoginDialog" class="underline">logged in</a>
-                  before editing timestamps</template
+  <LoadingOverlay class="h-full flex flex-col" :is-loading="isSavingTimestamps">
+    <header
+      class="pl-8 pr-2 py-2 box-border border-b border-on-surface border-opacity-divider flex-0"
+    >
+      <h6 class="section-header flex flex-row items-center justify-between">
+        <span>Timestamps</span>
+        <ToolbarButton icon="ic_close.svg" @click="hideDialog()" />
+      </h6>
+    </header>
+    <div class="scroll select-none pt-2 flex-1">
+      <table class="w-full">
+        <tr>
+          <td :colspan="4" class="px-4 text-center">
+            <ToolbarButton
+              v-if="isEditing"
+              class="w-full"
+              title="New timestamp"
+              icon="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+              @click="onClickAddNew"
+            />
+            <p v-if="!canEditTimestamps" class="text-error body-2 my-2">
+              <template v-if="!isLoggedIn"
+                >You need to be
+                <a href="#" @click.prevent.stop="openLoginDialog" class="underline">logged in</a>
+                before editing timestamps</template
+              >
+              <template v-else-if="episodeUrl == null"
+                >Connect the episode to Anime Skip before editing timestamps</template
+              >
+              <template v-else
+                >Hmm... something is wrong. Are you logged in and is the episode connected to Anime
+                Skip?</template
+              >
+            </p>
+          </td>
+        </tr>
+        <tr v-if="activeTimestamps.length === 0">
+          <p class="py-4 text-center text-opacity-low">No timestamps</p>
+        </tr>
+        <template v-else>
+          <tr
+            v-for="timestamp of activeTimestamps"
+            class="bg-on-surface bg-opacity-0 hover:bg-opacity-hover focus-within:bg-opacity-active transition-colors cursor-pointer py-2 px-4 group"
+            :key="timestamp.id"
+            @click="onClickTimestamp(timestamp)"
+            @mouseenter="onHoverTimestamp(timestamp)"
+            @mouseleave.stop.prevent="onStopHoverTimestamp()"
+          >
+            <td>
+              <div class="pl-4 text-right">
+                <h6 class="font-bold text-lg pt-0.5" :style="itemTimestampStyle(timestamp)">
+                  {{ itemTime(timestamp) }}
+                </h6>
+                <p
+                  v-if="timestamp.edited"
+                  class="overflow-y-visible -mt-2 text-2xs uppercase"
+                  :style="itemTimestampStyle(timestamp)"
                 >
-                <template v-else-if="episodeUrl == null"
-                  >Connect the episode to Anime Skip before editing timestamps</template
-                >
-                <template v-else
-                  >Hmm... something is wrong. Are you logged in and is the episode connected to
-                  Anime Skip?</template
-                >
+                  {{ itemNote(timestamp) }}
+                </p>
+              </div>
+            </td>
+            <td class="px-4 py-2 spacy-y-1 w-90%">
+              <p class="">{{ itemType(timestamp) }}</p>
+              <p v-if="itemHasSource(timestamp)" class="body-2 text-on-surface text-opacity-low">
+                {{ itemSouce(timestamp) }}
               </p>
             </td>
-          </tr>
-          <tr v-if="activeTimestamps.length === 0">
-            <p class="py-4 text-center text-opacity-low">No timestamps</p>
-          </tr>
-          <template v-else>
-            <tr
-              v-for="timestamp of activeTimestamps"
-              class="bg-on-surface bg-opacity-0 hover:bg-opacity-hover focus-within:bg-opacity-active transition-colors cursor-pointer py-2 px-4 group"
-              :key="timestamp.id"
-              @click="onClickTimestamp(timestamp)"
-              @mouseenter="onHoverTimestamp(timestamp)"
-              @mouseleave.stop.prevent="onStopHoverTimestamp()"
-            >
-              <td>
-                <div class="pl-4 text-right">
-                  <h6 class="font-bold text-lg pt-0.5" :style="itemTimestampStyle(timestamp)">
-                    {{ itemTime(timestamp) }}
-                  </h6>
-                  <p
-                    v-if="timestamp.edited"
-                    class="overflow-y-visible -mt-2 text-2xs uppercase"
-                    :style="itemTimestampStyle(timestamp)"
-                  >
-                    {{ itemNote(timestamp) }}
-                  </p>
+            <template v-if="canEditTimestamps">
+              <td class="w-10 py-1">
+                <div
+                  class="w-6 p-2 rounded-full box-content opacity-0 group-hover:opacity-medium hover:bg-on-surface hover:bg-opacity-active transition-all"
+                >
+                  <WebExtImg src="ic_delete.svg" @click.stop="deleteTimestamp(timestamp)" />
                 </div>
               </td>
-              <td class="px-4 py-2 spacy-y-1 w-90%">
-                <p class="">{{ itemType(timestamp) }}</p>
-                <p v-if="itemHasSource(timestamp)" class="body-2 text-on-surface text-opacity-low">
-                  {{ itemSouce(timestamp) }}
-                </p>
+              <td class="w-10 py-1">
+                <div
+                  class="w-6 p-2 mr-2 rounded-full box-content opacity-low group-hover:opacity-medium hover:bg-on-surface hover:bg-opacity-active"
+                >
+                  <WebExtImg src="ic_edit.svg" @click.stop="editTimestamp(timestamp)" />
+                </div>
               </td>
-              <template v-if="canEditTimestamps">
-                <td class="w-10 py-1">
-                  <div
-                    class="w-6 p-2 rounded-full box-content opacity-0 group-hover:opacity-medium hover:bg-on-surface hover:bg-opacity-active transition-all"
-                  >
-                    <WebExtImg src="ic_delete.svg" @click.stop="deleteTimestamp(timestamp)" />
-                  </div>
-                </td>
-                <td class="w-10 py-1">
-                  <div
-                    class="w-6 p-2 mr-2 rounded-full box-content opacity-low group-hover:opacity-medium hover:bg-on-surface hover:bg-opacity-active"
-                  >
-                    <WebExtImg src="ic_edit.svg" @click.stop="editTimestamp(timestamp)" />
-                  </div>
-                </td>
-              </template>
-            </tr>
-          </template>
-        </table>
-      </div>
-      <footer v-if="canEditTimestamps" class="flex flex-row-reverse justify-center flex-shrink-0">
-        <template v-if="isEditing">
-          <RaisedButton class="text-on-primary" @click="onClickSave">Save Changes</RaisedButton>
-          <div class="flex-1" />
-          <RaisedButton dark class="text-on-secondary" @click="onClickDiscard"
-            >Discard</RaisedButton
-          >
+            </template>
+          </tr>
         </template>
-        <template v-else>
-          <RaisedButton class="text-on-primary justify-self-center" @click="startEditing">
-            Start Editing
-          </RaisedButton>
-        </template>
-      </footer>
+      </table>
     </div>
+    <footer v-if="canEditTimestamps" class="flex flex-row-reverse justify-center flex-shrink-0 p-4">
+      <template v-if="isEditing">
+        <RaisedButton class="text-on-primary" @click="onClickSave">Save Changes</RaisedButton>
+        <div class="flex-1" />
+        <RaisedButton dark class="text-on-secondary" @click="onClickDiscard">Discard</RaisedButton>
+      </template>
+      <template v-else>
+        <RaisedButton class="text-on-primary justify-self-center" @click="startEditing">
+          Start Editing
+        </RaisedButton>
+      </template>
+    </footer>
   </LoadingOverlay>
 </template>
 

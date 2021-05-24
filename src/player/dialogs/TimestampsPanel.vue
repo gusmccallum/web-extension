@@ -6,8 +6,20 @@
     gravity-y="center"
     @show="onShow"
   >
-    <EditTimestamp v-if="activeTimestamp != null" :initial-tab="initialTab" />
-    <TimestampList v-else />
+    <div>
+      <ResizingPager :page="activePage">
+        <template #1>
+          <div class="page">
+            <TimestampList />
+          </div>
+        </template>
+        <template #2>
+          <div class="page">
+            <EditTimestamp :initial-tab="initialTab" />
+          </div>
+        </template>
+      </ResizingPager>
+    </div>
   </BasicDialog>
 </template>
 
@@ -20,10 +32,11 @@ import EditTimestamp from '../components/EditTimestamp.vue';
 import BasicDialog from './BasicDialog.vue';
 import { MutationTypes } from '@/common/store/mutationTypes';
 import { GetterTypes } from '@/common/store/getterTypes';
+import { ResizingPager } from 'vue-resizing-pager';
 
 export default defineComponent({
   name: 'TimestampsPanel',
-  components: { BasicDialog, TimestampList, EditTimestamp },
+  components: { BasicDialog, TimestampList, EditTimestamp, ResizingPager },
   mixins: [VideoControllerMixin, KeyboardShortcutsMixin],
   data() {
     return {
@@ -33,6 +46,9 @@ export default defineComponent({
   computed: {
     activeTimestamp(): Api.AmbiguousTimestamp | undefined {
       return this.$store.state.activeTimestamp;
+    },
+    activePage(): number {
+      return this.activeTimestamp != null ? 2 : 1;
     },
   },
   methods: {
@@ -71,10 +87,6 @@ export default defineComponent({
   pointer-events: none;
 
   .dialog-root-container {
-    width: 300px;
-    min-height: 500px;
-    height: 70%;
-    max-height: 800px;
     margin-bottom: 36px;
     pointer-events: auto;
     display: flex;
@@ -89,10 +101,18 @@ export default defineComponent({
       margin-bottom: 60px;
       border-top-left-radius: 0px;
     }
+  }
+}
 
-    & > * {
-      padding: 14px 16px;
-    }
+.page {
+  width: 300px;
+  min-height: 500px;
+  height: 70%;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  & > * {
+    flex: 1;
   }
 }
 </style>
