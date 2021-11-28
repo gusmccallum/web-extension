@@ -13,6 +13,15 @@ export enum ParentHosts {
 }
 
 /**
+ * Some hosts are not static. Their exact domains are configured at remote-config.anime-skip.com,
+ * but we need generic matchers for the manifest that covers all the possibilities so we can inject
+ * the player
+ */
+export enum DynamicParentHosts {
+  NINE_ANIME = 'https://9anime.*/*',
+}
+
+/**
  * All the host permission url matchers that run the injected player scripts
  */
 export enum PlayerHosts {

@@ -2,6 +2,7 @@ import merge from 'lodash.merge';
 import { readJsonFile } from 'vite-plugin-web-extension';
 import { Manifest } from 'webextension-polyfill';
 import {
+  DynamicParentHosts,
   PAGE_ACTION_MATCHES,
   ParentHosts,
   PlayerHosts,
@@ -27,6 +28,7 @@ export function generateManifest(config: GenerateManifestConfig): Manifest.WebEx
   const name = pkg.displayName + suffixes[config.mode];
   const contentScriptMatches = new Set([
     ...Object.values(ParentHosts),
+    ...Object.values(DynamicParentHosts),
     ...Object.values(PlayerHosts),
   ]);
 

@@ -278,6 +278,10 @@ const allTimestampSources = Object.values(TimestampSource);
 export const SUPPORTED_THIRD_PARTY_SERVICES: Record<Service, Array<TimestampSource>> = {
   'test-service': allTimestampSources,
   vrv: allTimestampSources,
+  '9anime': allTimestampSources.filter(
+    // Don't support BETTER_VRV because show names and durations are completely different
+    source => source !== 'BETTER_VRV'
+  ),
   funimation: allTimestampSources.filter(
     // Don't support BETTER_VRV because show names and durations are completely different
     source => source !== 'BETTER_VRV'
