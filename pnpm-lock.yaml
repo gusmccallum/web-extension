@@ -2,6 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@anime-skip/api-client': ^2.6.1
+  '@anime-skip/remote-config': 1.1.0
   '@anime-skip/ui': ^1.2.9
   '@anime-skip/usage-stats-client': ^1.2.2
   '@iconify/json': ^1.1.386
@@ -63,6 +64,7 @@ specifiers:
 
 dependencies:
   '@anime-skip/api-client': 2.6.1
+  '@anime-skip/remote-config': 1.1.0
   '@anime-skip/ui': 1.2.9_ec1b06fcfbd6e462bf1374dd899f0179
   '@anime-skip/usage-stats-client': 1.2.2_axios@0.24.0
   '@vueuse/core': 5.3.0_vue@3.2.2
@@ -133,6 +135,10 @@ packages:
       md5: 2.3.0
     transitivePeerDependencies:
       - debug
+    dev: false
+
+  /@anime-skip/remote-config/1.1.0:
+    resolution: {integrity: sha512-aZyOsAWACZMeEJ36zaV5MO81Z1OhiQmV/th370qpy4kB89s/V1oWs/mFx2amhQqPE8lZ4b6WVY/W/PFzFhLE9g==, tarball: download/@anime-skip/remote-config/1.1.0/908a937ca16b19ca99be365f5c9054e09839f4149bc37a9a5af9038129ee0f5d}
     dev: false
 
   /@anime-skip/ui/1.2.9_ec1b06fcfbd6e462bf1374dd899f0179:
